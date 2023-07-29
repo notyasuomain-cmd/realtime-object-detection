@@ -28,6 +28,7 @@ while True:
     for result in results:
         boxes = result.boxes
         for box in boxes:
+            ## box coordinates
             x1, y1, x2, y2 = box.xyxy.tolist()[0]
             
             
