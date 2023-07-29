@@ -22,7 +22,7 @@ while True:
     ret, frame = vid.read()
 
     ## make prediction with YOLOV8
-    results = model.predict(frame)
+    results = model.predict(frame) ## verbose=False to hide log
 
     ## for each result draw the boxes
     for result in results:
@@ -34,7 +34,10 @@ while True:
             predicton = names[int(box.cls.tolist()[0])]
             confidence = box.conf.tolist()[0]
             
-            if int(confidence*100) >= 75:
+
+            classes = ["person", "bottle", "remote"]
+            ## if confidence is greater than 75% and prediction in our classes then draw boxes and put text
+            if int(confidence*100) >= 75 and predicton in classes:
                 ## draw boxes
                 cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 0, 255), 2)
                 ## puttext with class name and confidence
