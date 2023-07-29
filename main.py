@@ -13,7 +13,7 @@ vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 720)
 while True:
     ret, frame = vid.read()
 
-    results = model.predict(frame, verbose=False)
+    results = model.predict(frame)
 
     for result in results:
         boxes = result.boxes
