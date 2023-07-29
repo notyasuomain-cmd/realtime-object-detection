@@ -10,7 +10,7 @@ model = YOLO("yolov8n.pt")
 vid = cv2.VideoCapture(0)
 # class names for prediction
 NAMES = model.names
-
+print(type(NAMES))
 
 # set resulution
 vid.set(cv2.CAP_PROP_FRAME_WIDTH, 1280)
@@ -31,7 +31,7 @@ while True:
             # box coordinates
             x1, y1, x2, y2 = box.xyxy.tolist()[0]
 
-            predicton = NAMES[int(box.cls.tolist()[0])]
+            predicton = NAMES.get(int(box.cls.tolist()[0]))
             confidence = box.conf.tolist()[0]
 
             classes = ["person", "bottle", "remote"]
