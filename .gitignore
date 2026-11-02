@@ -5,3 +5,17 @@ include/*
 share/*
 pyvenv.cfg
 .env
+__pycache__/
+.pytest_cache/
+.venv/
+dataset/images/*
+dataset/labels/*
+!dataset/images/train/
+!dataset/images/val/
+!dataset/labels/train/
+!dataset/labels/val/
+!dataset/images/train/.gitkeep
+!dataset/images/val/.gitkeep
+!dataset/labels/train/.gitkeep
+!dataset/labels/val/.gitkeep
+runs/
