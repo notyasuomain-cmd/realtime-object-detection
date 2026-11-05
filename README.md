@@ -12,6 +12,7 @@ confidence, the application sends an HTTP request to a sprinkler controller.
 - Activates an external sprinkler API when a target is detected.
 - Uses a cooldown period to prevent repeated API requests.
 - Supports webcam and local video sources for demonstrations.
+- Supports a generic YOLO model and a separate custom lawnmower model.
 - Provides a dry-run mode that never sends hardware-control requests.
 - Handles camera, configuration, and HTTP errors explicitly.
 
@@ -80,7 +81,9 @@ the real `.env` file because it can contain camera credentials.
 ### RTSP camera
 
 ```bash
-python main.py --model path/to/model.pt
+python main.py \
+  --model yolov8n.pt \
+  --lawnmower-model path/to/robot_lawnmower_best.pt
 ```
 
 When `--source` is omitted, the RTSP URL is built from `.env`.
@@ -91,6 +94,21 @@ When `--source` is omitted, the RTSP URL is built from `.env`.
 python main.py --source 0 --dry-run
 python main.py --source demo.mp4 --dry-run
 ```
+
+To use both the generic COCO classes (`dog` and `cat`) and your custom
+`robot_lawnmower` model:
+
+```bash
+python main.py \
+  --source demo.mp4 \
+  --model yolov8n.pt \
+  --lawnmower-model path/to/robot_lawnmower_best.pt \
+  --dry-run
+```
+
+The generic model detects standard classes such as `dog` and `cat`; the
+custom model detects `robot_lawnmower`. Both models are run on each frame and
+their detections are drawn together.
 
 The `--dry-run` option logs sprinkler activations without sending an HTTP
 request. Press `q` in the video window to stop the application.

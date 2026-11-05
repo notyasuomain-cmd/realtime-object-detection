@@ -26,7 +26,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--model",
         default="yolov8n.pt",
-        help="YOLO model path (default: yolov8n.pt).",
+        help="Generic YOLO model path for standard classes (default: yolov8n.pt).",
+    )
+    parser.add_argument(
+        "--lawnmower-model",
+        default=None,
+        help="Optional custom YOLO model path for robot_lawnmower.",
     )
     parser.add_argument(
         "--dry-run",
@@ -45,10 +50,18 @@ def open_capture(source: str) -> cv2.VideoCapture:
     return capture
 
 
-def run(source: str | None = None, model_path: str = "yolov8n.pt", dry_run: bool = False) -> None:
+def run(
+    source: str | None = None,
+    model_path: str = "yolov8n.pt",
+    dry_run: bool = False,
+    lawnmower_model_path: str | None = None,
+) -> None:
     config = load_config()
     video_source = source or config.rtsp_url
-    model = YOLO(model_path)
+    generic_model = YOLO(model_path)
+    lawnmower_model = (
+        YOLO(lawnmower_model_path) if lawnmower_model_path else None
+    )
     capture = open_capture(video_source)
     sprinkler = SprinklerClient(
         config.api_url,
@@ -67,10 +80,22 @@ def run(source: str | None = None, model_path: str = "yolov8n.pt", dry_run: bool
                 break
 
             detections = detect_objects(
-                model.predict(frame, verbose=False, device="cpu"),
-                model.names,
+                generic_model.predict(frame, verbose=False, device="cpu"),
+                generic_model.names,
                 config.confidence_threshold,
             )
+            if lawnmower_model is not None:
+                detections.extend(
+                    detect_objects(
+                        lawnmower_model.predict(
+                            frame,
+                            verbose=False,
+                            device="cpu",
+                        ),
+                        lawnmower_model.names,
+                        config.confidence_threshold,
+                    )
+                )
             target_detected = any(
                 detection.class_name in config.target_classes
                 for detection in detections
@@ -94,7 +119,7 @@ def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
     args = parse_args()
     try:
-        run(args.source, args.model, args.dry_run)
+        run(args.source, args.model, args.dry_run, args.lawnmower_model)
     except (KeyError, RuntimeError, ValueError) as error:
         logger.error("%s", error)
         raise SystemExit(1) from error
