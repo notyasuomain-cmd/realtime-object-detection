@@ -1,4 +1,4 @@
-# Real-time robot lawnmower detection
+# Real-time cat detection
 
 Real-time object detection system for recognizing a cat from an
 RTSP camera stream. When the configured object is detected with sufficient
